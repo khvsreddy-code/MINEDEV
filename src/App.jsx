@@ -27,6 +27,19 @@ function App() {
   const [progressMessage, setProgressMessage] = useState('');
   const [modelColor, setModelColor] = useState('#22d3ee');
 
+  // Enhanced 3D Viewer State
+  const [viewMode, setViewMode] = useState('solid'); // 'wireframe', 'solid', 'shaded', 'textured'
+  const [showGrid, setShowGrid] = useState(true);
+  const [showCollision, setShowCollision] = useState(false);
+  const [showLOD, setShowLOD] = useState(false);
+  const [lodLevel, setLodLevel] = useState(0); // 0=LOD0, 1=LOD1, etc.
+  const [autoRotate, setAutoRotate] = useState(false);
+  const [measurementMode, setMeasurementMode] = useState(false);
+  const [markers, setMarkers] = useState([]);
+  const [transformMode, setTransformMode] = useState(null); // 'translate', 'rotate', 'scale'
+  const cameraRef = useRef();
+  const controlsRef = useRef();
+
   const handleGenerate = async () => {
     setGenerating(true);
     setProgress(0);
@@ -103,6 +116,34 @@ function App() {
     }
   };
 
+  // Camera snap to view
+  const snapToView = (view) => {
+    if (!controlsRef.current) return;
+
+    const distance = 5;
+    const positions = {
+      'front': { x: 0, y: 0, z: distance },
+      'back': { x: 0, y: 0, z: -distance },
+      'left': { x: -distance, y: 0, z: 0 },
+      'right': { x: distance, y: 0, z: 0 },
+      'top': { x: 0, y: distance, z: 0 },
+      'bottom': { x: 0, y: -distance, z: 0 }
+    };
+
+    if (cameraRef.current && positions[view]) {
+      cameraRef.current.position.set(
+        positions[view].x,
+        positions[view].y,
+        positions[view].z
+      );
+      cameraRef.current.lookAt(0, 0, 0);
+      if (controlsRef.current) {
+        controlsRef.current.update();
+      }
+    }
+  };
+
+  // Export model
   const handleExport = () => {
     if (!generated3D?.modelUrl) return;
 
@@ -328,12 +369,13 @@ function App() {
             position: 'relative',
             minHeight: '600px'
           }}>
-            {/* Viewport Controls */}
+            {/* Enhanced Viewport Controls */}
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: '1rem'
+              marginBottom: '1rem',
+              gap: '1rem'
             }}>
               <h3 style={{ fontSize: '0.9rem', color: '#22d3ee', letterSpacing: '0.1em' }}>
                 3D PREVIEW
@@ -375,6 +417,170 @@ function App() {
                 )}
               </div>
             </div>
+
+            {/* Advanced Viewer Toolbar */}
+            {generated3D && (
+              <div style={{
+                display: 'flex',
+                gap: '1rem',
+                marginBottom: '1rem',
+                flexWrap: 'wrap',
+                background: 'rgba(0, 0, 0, 0.4)',
+                padding: '0.75rem',
+                borderRadius: '0.5rem',
+                border: '1px solid rgba(34, 211, 238, 0.2)'
+              }}>
+                {/* Camera Snap Buttons */}
+                <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.6rem', color: '#94a3b8', marginRight: '0.5rem', letterSpacing: '0.1em' }}>CAMERA:</span>
+                  {[
+                    { label: 'Front', icon: '⬆️' },
+                    { label: 'Back', icon: '⬇️' },
+                    { label: 'Left', icon: '⬅️' },
+                    { label: 'Right', icon: '➡️' },
+                    { label: 'Top', icon: '🔝' },
+                    { label: 'Bottom', icon: '🔽' }
+                  ].map(view => (
+                    <button
+                      key={view.label}
+                      onClick={() => snapToView(view.label.toLowerCase())}
+                      style={{
+                        padding: '0.35rem 0.6rem',
+                        background: 'rgba(34, 211, 238, 0.1)',
+                        border: '1px solid rgba(34, 211, 238, 0.3)',
+                        borderRadius: '0.25rem',
+                        color: '#22d3ee',
+                        cursor: 'pointer',
+                        fontSize: '0.65rem',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={e => e.target.style.background = 'rgba(34, 211, 238, 0.2)'}
+                      onMouseLeave={e => e.target.style.background = 'rgba(34, 211, 238, 0.1)'}
+                    >
+                      {view.icon}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Visualization Mode Toggles */}
+                <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.6rem', color: '#94a3b8', marginRight: '0.5rem', letterSpacing: '0.1em' }}>VIEW:</span>
+                  {[
+                    { mode: 'solid', label: '🎨 Solid', color: '#22d3ee' },
+                    { mode: 'wireframe', label: '🔲 Wire', color: '#3b82f6' },
+                    { mode: 'shaded', label: '🌐 Shaded', color: '#8b5cf6' }
+                  ].map(m => (
+                    <button
+                      key={m.mode}
+                      onClick={() => setViewMode(m.mode)}
+                      style={{
+                        padding: '0.35rem 0.6rem',
+                        background: viewMode === m.mode ? `rgba(34, 211, 238, 0.25)` : 'rgba(34, 211, 238, 0.1)',
+                        border: `1px solid ${viewMode === m.mode ? '#22d3ee' : 'rgba(34, 211, 238, 0.3)'}`,
+                        borderRadius: '0.25rem',
+                        color: viewMode === m.mode ? '#22d3ee' : '#94a3b8',
+                        cursor: 'pointer',
+                        fontSize: '0.65rem',
+                        fontWeight: viewMode === m.mode ? 'bold' : 'normal',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Display Toggles */}
+                <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.6rem', color: '#94a3b8', marginRight: '0.5rem', letterSpacing: '0.1em' }}>SHOW:</span>
+                  <button
+                    onClick={() => setShowGrid(!showGrid)}
+                    style={{
+                      padding: '0.35rem 0.6rem',
+                      background: showGrid ? 'rgba(34, 211, 238, 0.25)' : 'rgba(34, 211, 238, 0.1)',
+                      border: `1px solid ${showGrid ? '#22d3ee' : 'rgba(34, 211, 238, 0.3)'}`,
+                      borderRadius: '0.25rem',
+                      color: showGrid ? '#22d3ee' : '#94a3b8',
+                      cursor: 'pointer',
+                      fontSize: '0.65rem'
+                    }}
+                  >
+                    📐 Grid
+                  </button>
+                  <button
+                    onClick={() => setShowCollision(!showCollision)}
+                    style={{
+                      padding: '0.35rem 0.6rem',
+                      background: showCollision ? 'rgba(34, 211, 238, 0.25)' : 'rgba(34, 211, 238, 0.1)',
+                      border: `1px solid ${showCollision ? '#22d3ee' : 'rgba(34, 211, 238, 0.3)'}`,
+                      borderRadius: '0.25rem',
+                      color: showCollision ? '#22d3ee' : '#94a3b8',
+                      cursor: 'pointer',
+                      fontSize: '0.65rem'
+                    }}
+                  >
+                    🛡️ Collision
+                  </button>
+                  <button
+                    onClick={() => setAutoRotate(!autoRotate)}
+                    style={{
+                      padding: '0.35rem 0.6rem',
+                      background: autoRotate ? 'rgba(34, 211, 238, 0.25)' : 'rgba(34, 211, 238, 0.1)',
+                      border: `1px solid ${autoRotate ? '#22d3ee' : 'rgba(34, 211, 238, 0.3)'}`,
+                      borderRadius: '0.25rem',
+                      color: autoRotate ? '#22d3ee' : '#94a3b8',
+                      cursor: 'pointer',
+                      fontSize: '0.65rem'
+                    }}
+                  >
+                    🔄 Rotate
+                  </button>
+                </div>
+
+                {/* Transform Tools */}
+                <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.6rem', color: '#94a3b8', marginRight: '0.5rem', letterSpacing: '0.1em' }}>TOOLS:</span>
+                  {[
+                    { mode: 'translate', icon: '↔️', label: 'Move' },
+                    { mode: 'rotate', icon: '🔄', label: 'Rotate' },
+                    { mode: 'scale', icon: '⤢', label: 'Scale' },
+                    { mode: 'marker', icon: '📍', label: 'Marker' }
+                  ].map(tool => (
+                    <button
+                      key={tool.mode}
+                      onClick={() => setTransformMode(transformMode === tool.mode ? null : tool.mode)}
+                      style={{
+                        padding: '0.35rem 0.6rem',
+                        background: transformMode === tool.mode ? 'rgba(34, 211, 238, 0.25)' : 'rgba(34, 211, 238, 0.1)',
+                        border: `1px solid ${transformMode === tool.mode ? '#22d3ee' : 'rgba(34, 211, 238, 0.3)'}`,
+                        borderRadius: '0.25rem',
+                        color: transformMode === tool.mode ? '#22d3ee' : '#94a3b8',
+                        cursor: 'pointer',
+                        fontSize: '0.65rem'
+                      }}
+                    >
+                      {tool.icon}{' '}{tool.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Measurement Button */}
+                <button
+                  onClick={() => setMeasurementMode(!measurementMode)}
+                  style={{
+                    padding: '0.35rem 0.6rem',
+                    background: measurementMode ? 'rgba(34, 211, 238, 0.25)' : 'rgba(34, 211, 238, 0.1)',
+                    border: `1px solid ${measurementMode ? '#22d3ee' : 'rgba(34, 211, 238, 0.3)'}`,
+                    borderRadius: '0.25rem',
+                    color: measurementMode ? '#22d3ee' : '#94a3b8',
+                    cursor: 'pointer',
+                    fontSize: '0.65rem'
+                  }}
+                >
+                  📏 Measure
+                </button>
+              </div>
+            )}
 
             {/* 3D Canvas */}
             <div style={{
