@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+python-multipart
+pillow
+numpy
+torch
+torchvision
+diffusers
+transformers
+accelerate
+trimesh
+scipy
+networkx
+pygltflib
+xatlas
+# Note: Install TripoSR separately if needed:
+# pip install git+https://github.com/VAST-AI-Research/TripoSR.git
