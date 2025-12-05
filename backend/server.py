@@ -11,7 +11,7 @@ import json
 import os
 from pathlib import Path
 
-app = FastAPI(title="AetherForge Nexus API V15.3")
+app = FastAPI(title="MINEDEV - AetherForge Nexus API V15.3")
 
 app.add_middleware(
     CORSMiddleware,
@@ -62,7 +62,7 @@ from pipeline.engine_export import export_for_unity, export_for_unreal
 @app.get("/")
 async def root():
     return {
-        "name": "AetherForge Nexus V15.3",
+        "name": "MINEDEV - AetherForge Nexus V15.3",
         "status": "online",
         "features": [
             "text-to-3d",

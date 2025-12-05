@@ -1,4 +1,4 @@
-# AetherForge Nexus V15.3
+# MINEDEV - AetherForge Nexus V15.3
 ## The Ultimate Open-Source AI 3D Generation Toolkit for Game Developers
 
 <div align="center">
@@ -16,13 +16,13 @@
 
 ---
 
-## 🎯 What is AetherForge Nexus?
+## 🎯 What is MINEDEV - AetherForge Nexus?
 
-**AetherForge Nexus** is the world's most advanced open-source AI-powered 3D generation toolkit specifically built for game developers. Unlike commercial services like Meshy.ai, Tripo3D, or Hyper3D that cost money per generation, AetherForge runs **100% locally on your machine** with **zero cost** and **zero cloud dependencies**.
+**MINEDEV - AetherForge Nexus** is the world's most advanced open-source AI-powered 3D generation toolkit specifically built for game developers. Unlike commercial services like Meshy.ai, Tripo3D, or Hyper3D that cost money per generation, AetherForge runs **100% locally on your machine** with **zero cost** and **zero cloud dependencies**.
 
-### Why Choose AetherForge?
+### Why Choose MINEDEV?
 
-| Feature | Meshy.ai | Tripo3D | Hyper3D | **AetherForge** |
+| Feature | Meshy.ai | Tripo3D | Hyper3D | **MINEDEV** |
 |---------|----------|---------|---------|-----------------|
 | **Cost** | $0.02/gen | $0.03/gen | $0.05/gen | **$0 Forever** |
 | **Quality** | 8/10 | 7/10 | 9/10 | **9/10** |

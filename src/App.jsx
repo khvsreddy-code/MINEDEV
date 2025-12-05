@@ -154,7 +154,7 @@ function App() {
               marginBottom: '0.25rem',
               letterSpacing: '0.1em'
             }}>
-              AETHERFORGE NEXUS
+              MINEDEV - AETHERFORGE NEXUS
             </h1>
             <p style={{ fontSize: '0.7rem', color: '#22d3ee', opacity: 0.7 }}>
               V15.3 • OPEN-SOURCE LOCAL AI • ZERO COST
