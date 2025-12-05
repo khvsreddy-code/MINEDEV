@@ -11,7 +11,26 @@ accelerate
 trimesh
 scipy
 networkx
-pygltflib
-xatlas
-# Note: Install TripoSR separately if needed:
-# pip install git+https://github.com/VAST-AI-Research/TripoSR.git
+
+# AI Generation Libraries
+# Text/Image to 3D
+huggingface_hub
+
+# NPC Dialog Generation
+openai
+anthropic
+
+# Spritesheet & Animation
+opencv-python
+imageio
+moviepy
+
+# Video Motion Transfer
+mediapipe
+
+# Environment Generation
+noise  # Perlin noise for terrain
+
+# Additional utilities
+pydantic
+requests
